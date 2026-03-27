@@ -127,7 +127,7 @@ whisper/
 
 ```bash
 # Clone and install
-git clone https://github.com/ana-onwards/whisper.git
+git clone https://github.com/ana-n-garcia/whisper.git
 cd whisper && npm install
 
 # Start a whisper channel (creates a gist, gives you a pairing code)
