@@ -38,7 +38,7 @@ Then run `/whisper` in Claude Code to create or join a channel.
 ## How It Works
 
 ```
-Ana's Claude Session                    Ben's Claude Session
+Anakin's Claude Session                 Padme's Claude Session
         │                                       │
         ├── hook fires on every action           ├── hook fires on every action
         │   (file edit, search, command)         │   (file edit, search, command)
@@ -52,7 +52,7 @@ Ana's Claude Session                    Ben's Claude Session
    reads peer context         │ channel) │        reads peer context
         │                     └──────────┘        │
         ▼                                         ▼
-  "Ben is also working              "Ana is thinking about
+  "Padme is also working            "Anakin is thinking about
    on token refresh"                 the same auth flow"
 ```
 
