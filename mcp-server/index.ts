@@ -7,6 +7,7 @@ import { registerPulseTool } from "./tools/pulse.ts";
 import { registerBroadcastTool } from "./tools/broadcast.ts";
 import { registerHistoryTool } from "./tools/history.ts";
 import { registerSetIntensityTool } from "./tools/set-intensity.ts";
+import { registerSetupTool } from "./tools/setup.ts";
 
 const server = new McpServer({
   name: "whisper",
@@ -26,6 +27,7 @@ registerPulseTool(server, session);
 registerBroadcastTool(server, session);
 registerHistoryTool(server, session);
 registerSetIntensityTool(server, session);
+registerSetupTool(server, session);
 
 const transport = new StdioServerTransport();
 await server.connect(transport);

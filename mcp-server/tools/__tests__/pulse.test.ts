@@ -51,7 +51,7 @@ describe("whisper_pulse", () => {
     const session = makeSession({ gist_id: "" });
     const result = await callPulse(session);
 
-    expect(result.content[0].text).toContain("Not connected");
+    expect(result.content[0].text).toContain("No whisper session configured");
   });
 
   it("returns peer events", async () => {

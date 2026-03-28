@@ -21,3 +21,12 @@ export interface WhisperSession {
   last_comment_id?: number;
   local_events: WhisperEvent[];
 }
+
+export interface WhisperConfig {
+  gist_id: string;
+  gist_url: string;
+  session_id: string;
+  intensity: Intensity;
+  check_frequency_minutes: number;
+  auto_expiration_days: number;
+}
