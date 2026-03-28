@@ -1,8 +1,9 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import type { WhisperSession, WhisperEvent } from "../types.ts";
+import type { WhisperSession, WhisperEvent, Intensity } from "../types.ts";
 import { readComments } from "../gist.ts";
 import { detectOverlap } from "../matcher.ts";
+import { summarize } from "../summarizer.ts";
 
 export function registerPulseTool(
   server: McpServer,
@@ -48,8 +49,22 @@ export function registerPulseTool(
         session.peer_session_id = peerEvents[0].session_id;
       }
 
+      // Enrich events through summarizer at current intensity
+      const enrichedEvents = peerEvents.map((e) => {
+        if (e.event_type === "broadcast" || !e.tool_name) return e;
+        if (!e.raw_input) return e;
+        return summarize(
+          {
+            session_id: e.session_id,
+            tool_name: e.tool_name,
+            tool_input: e.raw_input as Record<string, unknown>,
+          },
+          session.intensity,
+        );
+      });
+
       // Format peer activity
-      const lines = formatPeerEvents(peerEvents, session.intensity);
+      const lines = formatPeerEvents(enrichedEvents, session.intensity);
 
       // Check for overlap
       const overlap = detectOverlap(session.local_events, peerEvents);
