@@ -22,6 +22,8 @@ export interface WhisperSession {
   local_events: WhisperEvent[];
 }
 
+export type Notifications = "all" | "important";
+
 export interface WhisperConfig {
   gist_id: string;
   gist_url: string;
@@ -29,4 +31,5 @@ export interface WhisperConfig {
   intensity: Intensity;
   check_frequency_minutes: number;
   auto_expiration_days: number;
+  notifications: Notifications;
 }

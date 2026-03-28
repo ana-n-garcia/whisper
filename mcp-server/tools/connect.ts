@@ -3,7 +3,7 @@ import { writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import type { WhisperSession, WhisperConfig } from "../types.ts";
+import type { WhisperSession, WhisperConfig, Notifications } from "../types.ts";
 import { createGist, readComments } from "../gist.ts";
 
 const CONFIG_DIR = join(homedir(), ".whisper");
@@ -33,7 +33,7 @@ export function connectSession(session: WhisperSession, gist_url?: string): void
 }
 
 /** Write config to ~/.whisper/config.json. Accepts partial overrides for preferences. */
-export function writeConfig(session: WhisperSession, preferences?: Partial<Pick<WhisperConfig, "intensity" | "check_frequency_minutes" | "auto_expiration_days">>): void {
+export function writeConfig(session: WhisperSession, preferences?: Partial<Pick<WhisperConfig, "intensity" | "check_frequency_minutes" | "auto_expiration_days" | "notifications">>): void {
   mkdirSync(CONFIG_DIR, { recursive: true });
   const config: WhisperConfig = {
     gist_id: session.gist_id,
@@ -42,6 +42,7 @@ export function writeConfig(session: WhisperSession, preferences?: Partial<Pick<
     intensity: preferences?.intensity ?? session.intensity,
     check_frequency_minutes: preferences?.check_frequency_minutes ?? 5,
     auto_expiration_days: preferences?.auto_expiration_days ?? 7,
+    notifications: preferences?.notifications ?? "important",
   };
   writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2));
 }
