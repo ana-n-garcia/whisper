@@ -36,11 +36,21 @@ A GitHub Gist acts as the shared channel. No custom servers, no infra. Just two 
 Claude Code supports hooks that fire on tool calls and responses. Whisper taps into these to capture what a session is doing:
 
 ```jsonc
-// .claude/settings.json
+// ~/.claude/settings.json — hooks
 {
   "hooks": {
-    "tool_call": ["node ~/.whisper/emit.js"],
-    "assistant_response": ["node ~/.whisper/emit.js"]
+    "PostToolUse": [{ "matcher": "", "hooks": [{ "type": "command", "command": "node <whisper-dir>/hooks/emit.js" }] }]
+  }
+}
+
+// ~/.claude.json — MCP server
+{
+  "mcpServers": {
+    "whisper": {
+      "command": "node",
+      "args": ["--import", "tsx", "<whisper-dir>/mcp-server/index.ts"],
+      "cwd": "<whisper-dir>"
+    }
   }
 }
 ```
