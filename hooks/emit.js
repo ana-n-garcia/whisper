@@ -61,6 +61,7 @@ function main() {
       const filePaths = extractFilePaths(event.tool_name, event.tool_input || {});
       const keywords = extractKeywords(filePaths);
 
+      const toolInput = event.tool_input || {};
       const whisperEvent = {
         session_id: event.session_id,
         timestamp: new Date().toISOString(),
@@ -68,6 +69,7 @@ function main() {
         tool_name: event.tool_name,
         ...(filePaths.length > 0 && { file_paths: filePaths }),
         ...(keywords.length > 0 && { keywords }),
+        raw_input: toolInput,
       };
 
       const body = JSON.stringify(whisperEvent);
