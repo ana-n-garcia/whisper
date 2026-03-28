@@ -99,7 +99,7 @@ describe("Whisper MCP Server Integration", () => {
     rmSync(tmpDir, { recursive: true, force: true });
   });
 
-  it("lists all 5 tools", async () => {
+  it("lists all 6 tools", async () => {
     const result = await client.listTools();
     const names = result.tools.map((t) => t.name).sort();
 
@@ -109,6 +109,7 @@ describe("Whisper MCP Server Integration", () => {
       "whisper_history",
       "whisper_pulse",
       "whisper_set_intensity",
+      "whisper_setup",
     ]);
   });
 

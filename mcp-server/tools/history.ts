@@ -17,7 +17,7 @@ export function registerHistoryTool(
       if (!session.gist_id) {
         return {
           content: [
-            { type: "text" as const, text: "Not connected. Use whisper_connect first." },
+            { type: "text" as const, text: "No whisper session configured. Use /whisper to set up, or call whisper_setup directly." },
           ],
         };
       }

@@ -3,11 +3,48 @@ import { writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import type { WhisperSession } from "../types.ts";
+import type { WhisperSession, WhisperConfig } from "../types.ts";
 import { createGist, readComments } from "../gist.ts";
 
 const CONFIG_DIR = join(homedir(), ".whisper");
 const CONFIG_PATH = join(CONFIG_DIR, "config.json");
+
+/** Connect session to a channel (create or join). Reusable by setup tool. */
+export function connectSession(session: WhisperSession, gist_url?: string): void {
+  if (!gist_url) {
+    const result = createGist(session.session_id);
+    session.gist_id = result.id;
+    session.gist_url = result.html_url;
+  } else {
+    session.gist_id = parseGistId(gist_url);
+    session.gist_url = gist_url.startsWith("http")
+      ? gist_url
+      : `https://gist.github.com/${gist_url}`;
+
+    // Discover peer
+    const { events } = readComments(session.gist_id);
+    for (const event of events) {
+      if (event.session_id !== session.session_id) {
+        session.peer_session_id = event.session_id;
+        break;
+      }
+    }
+  }
+}
+
+/** Write config to ~/.whisper/config.json. Accepts partial overrides for preferences. */
+export function writeConfig(session: WhisperSession, preferences?: Partial<Pick<WhisperConfig, "intensity" | "check_frequency_minutes" | "auto_expiration_days">>): void {
+  mkdirSync(CONFIG_DIR, { recursive: true });
+  const config: WhisperConfig = {
+    gist_id: session.gist_id,
+    gist_url: session.gist_url,
+    session_id: session.session_id,
+    intensity: preferences?.intensity ?? session.intensity,
+    check_frequency_minutes: preferences?.check_frequency_minutes ?? 5,
+    auto_expiration_days: preferences?.auto_expiration_days ?? 7,
+  };
+  writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2));
+}
 
 export function registerConnectTool(
   server: McpServer,
@@ -18,29 +55,7 @@ export function registerConnectTool(
     "Connect to a whisper channel. Pass a gist URL/ID to join, or omit to create a new channel.",
     { gist_url: z.string().optional().describe("Gist URL or ID to join. Omit to create a new channel.") },
     async ({ gist_url }) => {
-      if (!gist_url) {
-        // Create new channel
-        const result = createGist(session.session_id);
-        session.gist_id = result.id;
-        session.gist_url = result.html_url;
-      } else {
-        // Join existing channel
-        session.gist_id = parseGistId(gist_url);
-        session.gist_url = gist_url.startsWith("http")
-          ? gist_url
-          : `https://gist.github.com/${gist_url}`;
-
-        // Discover peer
-        const { events } = readComments(session.gist_id);
-        for (const event of events) {
-          if (event.session_id !== session.session_id) {
-            session.peer_session_id = event.session_id;
-            break;
-          }
-        }
-      }
-
-      // Write config for hook script
+      connectSession(session, gist_url);
       writeConfig(session);
 
       const peerInfo = session.peer_session_id
@@ -70,16 +85,4 @@ function parseGistId(urlOrId: string): string {
 
   // Bare ID
   return urlOrId;
-}
-
-function writeConfig(session: WhisperSession): void {
-  mkdirSync(CONFIG_DIR, { recursive: true });
-  writeFileSync(
-    CONFIG_PATH,
-    JSON.stringify({
-      gist_id: session.gist_id,
-      gist_url: session.gist_url,
-      session_id: session.session_id,
-    }),
-  );
 }

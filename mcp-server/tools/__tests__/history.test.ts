@@ -96,6 +96,6 @@ describe("whisper_history", () => {
     const session = makeSession({ gist_id: "" });
     const result = await callHistory(session, { count: 10 });
 
-    expect(result.content[0].text).toContain("Not connected");
+    expect(result.content[0].text).toContain("No whisper session configured");
   });
 });

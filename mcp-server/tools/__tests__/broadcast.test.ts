@@ -57,7 +57,7 @@ describe("whisper_broadcast", () => {
     const session = makeSession({ gist_id: "" });
     const result = await callBroadcast(session, { context: "hello" });
 
-    expect(result.content[0].text).toContain("Not connected");
+    expect(result.content[0].text).toContain("No whisper session configured");
     expect(postComment).not.toHaveBeenCalled();
   });
 
