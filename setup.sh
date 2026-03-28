@@ -41,14 +41,16 @@ if (!settings.hooks.PostToolUse) settings.hooks.PostToolUse = [];
 
 const hookCmd = 'node $WHISPER_DIR/hooks/emit.js';
 const hasHook = settings.hooks.PostToolUse.some(h =>
-  (typeof h === 'string' && h === hookCmd) ||
-  (typeof h === 'object' && h.command === hookCmd)
+  h && h.hooks && h.hooks.some(hk => hk.command === hookCmd)
 );
 
 if (!hasHook) {
   settings.hooks.PostToolUse.push({
-    type: 'command',
-    command: hookCmd,
+    matcher: '',
+    hooks: [{
+      type: 'command',
+      command: hookCmd,
+    }],
   });
 }
 
